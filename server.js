@@ -181,13 +181,13 @@ app.get('/directors/:id', async (req, res, next) => {
 });
 
 app.post('/directors', [authenticateToken, authorizeRole('admin')], async (req, res, next) => {
-  const { name } = req.body;
+  const { name, birtYear } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'name wajib diisi' });
   }
-  const sql = 'INSERT INTO directors (name) VALUES ($1) RETURNING *';
+  const sql = 'INSERT INTO directors (name, "birtYear") VALUES ($1) RETURNING *';
   try {
-    const result = await db.query(sql, [name]);
+    const result = await db.query(sql, [name, birtYear]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     next(err);
