@@ -181,13 +181,13 @@ app.get('/directors/:id', async (req, res, next) => {
 });
 
 app.post('/directors', [authenticateToken, authorizeRole('admin')], async (req, res, next) => {
-  const { name, birtYear } = req.body;
+  const { name, birthYear } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'name wajib diisi' });
   }
-  const sql = 'INSERT INTO directors (name, "birtYear") VALUES ($1) RETURNING *';
+  const sql = 'INSERT INTO directors (name, "birthYear") VALUES ($1, $2) RETURNING *';
   try {
-    const result = await db.query(sql, [name, birtYear]);
+    const result = await db.query(sql, [name, birthYear]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     next(err);
@@ -195,10 +195,10 @@ app.post('/directors', [authenticateToken, authorizeRole('admin')], async (req, 
 });
 
 app.put('/directors/:id', [authenticateToken, authorizeRole('admin')], async (req, res, next) => {
-  const { name } = req.body;
-  const sql = 'UPDATE directors SET name = $1 WHERE id = $2 RETURNING *';
+  const { name, birthYear } = req.body;
+  const sql = 'UPDATE directors SET name = $1, "birthYear" = $2 WHERE id = $3 RETURNING *';
   try {
-    const result = await db.query(sql, [name, req.params.id]);
+    const result = await db.query(sql, [name, birthYear, req.params.id]);
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Director tidak ditemukan' });
     }
